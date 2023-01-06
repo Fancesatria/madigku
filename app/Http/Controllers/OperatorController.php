@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Operator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StoreOperatorRequest;
 use App\Http\Requests\UpdateOperatorRequest;
-use App\Models\Operator;
 
 class OperatorController extends Controller
 {
@@ -28,9 +30,9 @@ class OperatorController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'operator'=>'required | alpha | max:255',
-            'username'=>'required | alpha | max:255',
-            'email'=>'required | string | email:dns,rfc | max:255',
+            'operator'=>'required | alpha_dash | max:255 | unique:operators',
+            'username'=>'required | alpha_dash | max:255 | unique:operators',
+            'email'=>'required | string | email | max:255 | unique:operators',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/',
             'telp'=>'required | numeric',
         ]);
@@ -48,7 +50,8 @@ class OperatorController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil disimpan',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
@@ -98,9 +101,9 @@ class OperatorController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request,[
-            'operator'=>'required | alpha | max:255',
-            'username'=>'required | alpha | max:255',
-            'email'=>'required | string | email:dns,rfc | max:255',
+            'operator'=>'required | alpha_dash | max:255 | unique:operators',
+            'username'=>'required | alpha_dash | max:255 | unique:operators',
+            'email'=>'required | string | email | max:255 | unique:operators',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/',
             'telp'=>'required | numeric',
         ]);
@@ -118,7 +121,8 @@ class OperatorController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil diperbaharui',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
@@ -143,7 +147,7 @@ class OperatorController extends Controller
 
     public function login(Request $request){
         $this->validate($request, [
-            'username'=>'required | alpha | max:255',
+            'username'=>'required | alpha_dash | max:255',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/'
         ]);
 
@@ -154,7 +158,7 @@ class OperatorController extends Controller
 
         if(isset($username)){
             if($user->status == 1){
-                if(Hash::check($passwword, $user->password)){
+                if(Hash::check($password, $user->password)){
                     return response()->json([
                         'pesan'=>'Login berhasil',
                         'data'=>$user

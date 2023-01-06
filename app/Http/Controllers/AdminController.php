@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAdminRequest;
-use App\Http\Requests\UpdateAdminRequest;
 use App\Models\Admin;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -29,9 +29,9 @@ class AdminController extends Controller
     {
         //validasi
         $this->validate($request, [
-            'admin'=>'required | alpha | max:255',
-            'username'=>'required | alpha | max:255',
-            'email'=>'required | string | email:dns,rfc | max:255',
+            'admin'=>'required | alpha_dash | max:255',
+            'username'=>'required | alpha_dash | max:255',
+            'email'=>'required | string | email | max:255 | unique:admins',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/',
             'telp'=>'required | numeric',
             // 'admin'=>'required',
@@ -44,6 +44,12 @@ class AdminController extends Controller
             'email'=>$request->input('email'),
             'password'=>Hash::make($request->input('password')),
             'telp'=>$request->input('telp'),
+            //yg dibawah ini sama aja
+            // 'admin'=>$request->admin,
+            // 'username'=>$request->username,
+            // 'email'=>$request->email,
+            // 'password'=>Hash::make($request->password),
+            // 'telp'=>$request->telp,
         ];
 
         //menjalankan data
@@ -53,7 +59,8 @@ class AdminController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil disimoan',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
@@ -104,9 +111,9 @@ class AdminController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request,[
-            'admin'=>'required | alpha | max:255',
-            'username'=>'required | alpha | max:255',
-            'email'=>'required | string | email:dns,rfc | max:255',
+            'admin'=>'required | alpha_dash | max:255',
+            'username'=>'required | alpha_dash | max:255',
+            'email'=>'required | string | email | max:255 | unique:admins',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/',
             'telp'=>'required | numeric',
         ]);
@@ -122,9 +129,10 @@ class AdminController extends Controller
         $run = Admin::where('id', $id)->update($data);
 
         if($run){
-            return respnse()->json([
+            return response()->json([
                 'pesan'=>'Data berhasil diperbaharui',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
@@ -150,7 +158,7 @@ class AdminController extends Controller
 
     public function login(Request $request){
         $this->validate($request, [
-            'username'=>'required | alpha | max:255',
+            'username'=>'required | alpha_dash | max:255',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/'
         ]);
 

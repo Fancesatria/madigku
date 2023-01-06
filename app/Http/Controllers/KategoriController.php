@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kategori;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreKategoriRequest;
 use App\Http\Requests\UpdateKategoriRequest;
-use App\Models\Kategori;
 
 class KategoriController extends Controller
 {
@@ -28,7 +29,7 @@ class KategoriController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'kategori'=>'required'
+            'kategori'=>'required | unique:kategoris'
         ]);
 
         $run = Kategori::create($request->all());
@@ -87,7 +88,7 @@ class KategoriController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'kategori'=>'required'
+            'kategori'=>'required | unique:kategoris'
         ]);
 
         $run = Kategori::where('id', $id)->update($request->all());
@@ -95,7 +96,8 @@ class KategoriController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil diperbaharui',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }

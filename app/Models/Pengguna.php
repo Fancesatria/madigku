@@ -10,4 +10,8 @@ class Pengguna extends Model
     use HasFactory;
 
     protected $table = 'penggunas';
+
+    protected $fillable = [
+        'pengguna','username','email','password','telp','gambar'
+    ];
 }

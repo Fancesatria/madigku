@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pengguna;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StorePenggunaRequest;
 use App\Http\Requests\UpdatePenggunaRequest;
-use App\Models\Pengguna;
 
 class PenggunaController extends Controller
 {
@@ -28,8 +30,8 @@ class PenggunaController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'pengguna'=>'required | alpha | max:255',
-            'email'=>'required | string | email:dns,rfc | max:255',
+            'pengguna'=>'required | alpha_dash | max:255 | unique:penggunas',
+            'email'=>'required | string | email | max:255 | unique:penggunas',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/',
             'telp'=>'required | numeric',
         ]);
@@ -44,7 +46,7 @@ class PenggunaController extends Controller
                 'email'=>$request->input('email'),
                 'password'=>Hash::make($request->input('password')),
                 'telp'=>$request->input('telp'),
-                'gambar'=>$gambar
+                'gambar'=>url('upload/'.$gambar)
             ];
         } else {
             $data = [
@@ -62,7 +64,8 @@ class PenggunaController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil disimpan',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
@@ -112,8 +115,8 @@ class PenggunaController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'pengguna'=>'required | alpha | max:255',
-            'email'=>'required | string | email:dns,rfc | max:255',
+            'pengguna'=>'required | alpha_dash | max:255 | unique:penggunas',
+            'email'=>'required | string | email | max:255 | unique:penggunas',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/',
             'telp'=>'required | numeric',
         ]);
@@ -127,7 +130,7 @@ class PenggunaController extends Controller
                 'email'=>$request->input('email'),
                 'password'=>Hash::make($request->input('password')),
                 'telp'=>$request->input('telp'),
-                'gambar'=>$gambar
+                'gambar'=>url('upload/'.$gambar)
             ];
 
         } else {
@@ -139,12 +142,13 @@ class PenggunaController extends Controller
             ];
         }
 
-        $run = Pengguna::where('id',$$id)->update($data);
+        $run = Pengguna::where('id', $id)->update($data);
 
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil diperbaharui',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
@@ -170,7 +174,7 @@ class PenggunaController extends Controller
     //login
     public function login(Request $request){
         $this->validate($request, [
-            'email'=>'required | string | email:dns,rfc | max:255',
+            'email'=>'required | string | email | max:255',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/'
         ]);
 
@@ -185,7 +189,7 @@ class PenggunaController extends Controller
                 if(Hash::check($password, $user->password)){ //password disandingkan apakah match
                     return response()->json([
                         'pesan'=>'Login Berhasil',
-                        'data'=>'$user'
+                        'data'=>$user
                     ]);
                 } else {
                     return response()->json([
@@ -210,10 +214,10 @@ class PenggunaController extends Controller
 
 
     //forget password
-    public function forget(Request $request){
+    public function forgot(Request $request){
         $this->validate($request, [
-            'pengguna'=>'required | alpha | max:255',
-            'email'=>'required | string | email:dns,rfc | max:255',
+            'pengguna'=>'required | alpha_dash | max:255',
+            'email'=>'required | string | email | max:255',
             'password'=>'required | min:8 | regex:/[a-z]/ | regex:/[A-Z]/ | regex:/[0-9]/ | regex:/[@$!%*#?&]/'
         ]);
 
@@ -254,7 +258,7 @@ class PenggunaController extends Controller
 
         $data = [
             //acces pubic path image
-            'gambar'=>url('upload', $gambar)
+            'gambar'=>url('upload/', $gambar)
         ];
 
         $run = Pengguna::where('id', $id)->update($data);

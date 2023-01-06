@@ -31,7 +31,8 @@ class KaryaController extends Controller
             'judul'=>'required',
             'keterangan'=>'required',
             'tgl_upload'=>'required',
-            'gambar'=>'required'
+            'gambar'=>'required',
+            'link'=>'active_url'
         ]);
 
         $gambar = $request->file('gambar')->getClientOriginalName();
@@ -41,7 +42,8 @@ class KaryaController extends Controller
             'judul'=>$request->input('judul'),
             'keterangan'=>$request->input('keterangan'),
             'tgl_upload'=>$request->input('tgl_upload'),
-            'gambar'=>$gambar
+            'gambar'=>url('karya/'.$gambar),
+            'link'=>$request->input('link')
         ];
 
         $run = Karya::create($data);
@@ -49,8 +51,9 @@ class KaryaController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil disimpan',
-                'gambar'=>$gambar,
-                'status'=>200
+                'gambar'=>url('karya/'.$gambar),
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
@@ -102,8 +105,9 @@ class KaryaController extends Controller
         $this->validate($request, [
             'judul'=>'required',
             'keterangan'=>'required',
+            'tgl_upload'=>'required',
             'gambar'=>'required',
-            'tgl_upload'=>'required'
+            'link'=>'active_url'
         ]);
 
         $gambar = $request->file('gambar')->getClientOriginalName();
@@ -113,7 +117,8 @@ class KaryaController extends Controller
             'judul'=>$request->input('judul'),
             'keterangan'=>$request->input('keterangan'),
             'tgl_upload'=>$request->input('tgl_upload'),
-            'gambar'=>$gambar
+            'gambar'=>url('karya/'.$gambar),
+            'link'=>$request->input('link')
         ];
 
         $run = Karya::where('id', $id)->update($data);
@@ -121,8 +126,9 @@ class KaryaController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil diperbaharui',
-                'gambar'=>$gambar,
-                'status'=>200
+                'gambar'=>url('karya/'.$gambar),
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }

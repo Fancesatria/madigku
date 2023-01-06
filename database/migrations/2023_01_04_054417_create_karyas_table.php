@@ -15,15 +15,19 @@ class CreateKaryasTable extends Migration
     {
         Schema::create('karyas', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('idkategori');
-            $table->bigInteger('idpengguna');
+            $table->bigInteger('idkategori')->unsigned();
+            $table->bigInteger('idpengguna')->unsigned();
             $table->string('judul');
             $table->string('keterangan');
             $table->string('gambar')->nullable();
             $table->date('tgl_upload');
             $table->string('status')->default('Menunggu Verifikasi');
-            $table->string('like')->default('0');
+            $table->string('link')->nullable();
+            $table->Integer('like')->default(0);
             $table->timestamps();
+
+            $table->foreign('idkategori')->references('id')->on('kategoris')->onDelete('cascade');
+            $table->foreign('idpengguna')->references('id')->on('penggunas')->onDelete('cascade');
         });
     }
 

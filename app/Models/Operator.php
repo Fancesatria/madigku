@@ -10,4 +10,8 @@ class Operator extends Model
     use HasFactory;
 
     protected $table = 'operators';
+
+    protected $fillable = [
+        'operator','username','email','password','telp'
+    ];
 }

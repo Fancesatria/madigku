@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kontak;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreKontakRequest;
 use App\Http\Requests\UpdateKontakRequest;
-use App\Models\Kontak;
 
 class KontakController extends Controller
 {
@@ -28,18 +29,20 @@ class KontakController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'email'=>'required | string | email:dns,rfc | max:255',
-            'telp'=>'required | numeric'
+            'email'=>'required | string | email| max:255',
+            'telp'=>'required | numeric',
+            'alamat'=>'required'
         ]);
 
-        // $data = [
-        //     'email'=>$request->input('email'),
-        //     'telp'=>$request->input('telp')
-        // ];
+        $data = [
+            'email'=>$request->input('email'),
+            'telp'=>$request->input('telp'),
+            'alamat'=>$request->input('alamat'),
+        ];
 
-        // $run = Kontak::create($data);
+        $run = Kontak::create($data);
 
-        $run = Kontak::where('id', $id)->update($request->all());
+        // $run = Kontak::create($request->all());
 
         if($run){
             return response()->json([
@@ -95,18 +98,20 @@ class KontakController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'email'=>'required | string | email:dns,rfc | max:255',
-            'telp'=>'required | numeric'
+            'email'=>'required | string | email | max:255',
+            'telp'=>'required | numeric',
+            'alamat'=>'required'
         ]);
 
-        // $data = [
-        //     'email'=>$request->input('email'),
-        //     'telp'=>$request->input('telp')
-        // ];
+        $data = [
+            'email'=>$request->input('email'),
+            'telp'=>$request->input('telp'),
+            'alamat'=>$request->input('alamat'),
+        ];
 
-        // $run = Kontak::where('id', $id)->update($data);
+        $run = Kontak::where('id', $id)->update($data);
 
-        $run = Kontak::where('id', $id)->update($request->all());
+        // $run = Kontak::where('id', $id)->update($request->all());
 
         if($run){
             return response()->json([

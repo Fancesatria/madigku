@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
-use App\Models\Event;
 
 class EventController extends Controller
 {
@@ -30,13 +31,18 @@ class EventController extends Controller
         $this->validate($request, [
             'judul'=>'required',
             'deskripsi'=>'required',
-            'tgl_event'=>'required | date'
+            'tgl_event'=>'required | date',
+            'gambar'=>'required'
         ]);
+
+        $gambar = $request->file('gambar')->getClientOriginalName();
+        $request->file('gambar')->move('event', $gambar);
 
         $data = [
             'judul'=>$request->input('judul'),
             'deskripsi'=>$request->input('deskripsi'),
-            'tgl_event'=>$request->input('tgl_event')
+            'tgl_event'=>$request->input('tgl_event'),
+            'gambar'=>url('event/'. $gambar)
         ];
 
         $run = Event::create($data);
@@ -44,7 +50,8 @@ class EventController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil disimpan',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
@@ -96,13 +103,18 @@ class EventController extends Controller
         $this->validate($request, [
             'judul'=>'required',
             'deskripsi'=>'required',
-            'tgl_event'=>'required | date'
+            'tgl_event'=>'required | date',
+            'gambar'=>'required'
         ]);
+
+        $gambar = $request->file('gambar')->getClientOriginalName();
+        $request->file('gambar')->move('event', $gambar);
 
         $data = [
             'judul'=>$request->input('judul'),
             'deskripsi'=>$request->input('deskripsi'),
-            'tgl_event'=>$request->input('tgl_event')
+            'tgl_event'=>$request->input('tgl_event'),
+            'gambar'=>url('event/'.$gambar)//ini ambik urlnyya, jadi gk lgsg ambil gambar
         ];
 
         $run = Event::where('id', $id)->update($data);
@@ -110,7 +122,8 @@ class EventController extends Controller
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil diperbaharui',
-                'status'=>200
+                'status'=>200,
+                'data'=>$data
             ]);
         }
     }
