@@ -112,7 +112,7 @@ class KontakController extends Controller
         $run = Kontak::where('id', $id)->update($data);
 
         // $run = Kontak::where('id', $id)->update($request->all());
-
+ 
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil diperbaharui',

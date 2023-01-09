@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Pengguna;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Karya extends Model
 {
@@ -12,6 +13,12 @@ class Karya extends Model
     protected $table = 'karyas';
 
     protected $fillable = [
-        'judul','keterangan','gambar','tgl_upload','like'
+        'judul','keterangan','gambar','tgl_upload','like','idkategori','idpengguna'
     ];
+
+    public function penciptaKarya(){
+        return $this->hasOne(Pengguna::class);
+    }
+
+
 }

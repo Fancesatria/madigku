@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengguna;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StorePenggunaRequest;
 use App\Http\Requests\UpdatePenggunaRequest;
@@ -15,6 +16,7 @@ class PenggunaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
         $data = Pengguna::all();
@@ -57,15 +59,15 @@ class PenggunaController extends Controller
             ];
         }
 
-
-
         $run = Pengguna::create($data);
+        $otp = mt_rand(10000, 999999);
 
         if($run){
             return response()->json([
                 'pesan'=>'Data berhasil disimpan',
                 'status'=>200,
-                'data'=>$data
+                'data'=>$data,
+                'otp'=>$otp
             ]);
         }
     }
@@ -90,6 +92,7 @@ class PenggunaController extends Controller
     public function show($id)
     {
         $data = Pengguna::where('id',$id)->get();
+
 
         return response()->json($data);
     }
@@ -189,7 +192,7 @@ class PenggunaController extends Controller
                 if(Hash::check($password, $user->password)){ //password disandingkan apakah match
                     return response()->json([
                         'pesan'=>'Login Berhasil',
-                        'data'=>$user
+                        'data'=>$user,
                     ]);
                 } else {
                     return response()->json([
@@ -249,19 +252,24 @@ class PenggunaController extends Controller
     //update gambar
     public function updateGambar(Request $request, $id){
         $this->validate($request, [
-            'image'=>'required'
+            'gambar'=>'required'
         ]);
 
-        $email = Pengguna::where('id', $id)->first();
+        // $email = Pengguna::where('id', $id)->first();
+        $email = str_replace(',','.',$id);
         $gambar = $request->file('gambar')->getClientOriginalName();
-        $request->file('gambar')->move('upload', $gambar);
+        $request->file('gambar')->move('upload/'. $gambar);
 
         $data = [
             //acces pubic path image
-            'gambar'=>url('upload/', $gambar)
+            'gambar'=>url('upload/'.$gambar)
         ];
 
-        $run = Pengguna::where('id', $id)->update($data);
+        // return response()->json($gambar);
+        // return response()->json($data);
+
+        // $run = Pengguna::where('email', $email)->update($data);
+        $run = Pengguna::where('id',$id)->update($data);
 
         if($run){
             return response()->json([

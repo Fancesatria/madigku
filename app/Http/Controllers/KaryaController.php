@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Karya;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreKaryaRequest;
 use App\Http\Requests\UpdateKaryaRequest;
-use App\Models\Karya;
 
 class KaryaController extends Controller
 {
@@ -15,7 +18,16 @@ class KaryaController extends Controller
      */
     public function index()
     {
+        // $data = DB::table('karyas')
+        // ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        // ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        // ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        // ->orderBy('karyas.judul','asc')
+        // ->get();
+
         $data = Karya::all();
+
+        // $data = Auth::pengguna();
 
         return response()->json($data);
     }
@@ -27,12 +39,13 @@ class KaryaController extends Controller
      */
     public function create(Request $request)
     {
+        //TO DOS : 1. AUTO MENGENALI ID PENGGUNA
         $this->validate($request, [
             'judul'=>'required',
             'keterangan'=>'required',
-            'tgl_upload'=>'required',
             'gambar'=>'required',
-            'link'=>'active_url'
+            'link'=>'active_url',
+            'idkategori'=>'required',
         ]);
 
         $gambar = $request->file('gambar')->getClientOriginalName();
@@ -41,9 +54,10 @@ class KaryaController extends Controller
         $data = [
             'judul'=>$request->input('judul'),
             'keterangan'=>$request->input('keterangan'),
-            'tgl_upload'=>$request->input('tgl_upload'),
             'gambar'=>url('karya/'.$gambar),
-            'link'=>$request->input('link')
+            'link'=>$request->input('link'),
+            'idkategori'=>$request->input('idkategori'),
+            'idpengguna'=>$request->input('idpengguna')
         ];
 
         $run = Karya::create($data);
@@ -77,7 +91,47 @@ class KaryaController extends Controller
      */
     public function show($id)
     {
-        $data = Karya::where('id', $id)->get();
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->where('karyas.id','=', $id)
+        ->orderBy('karyas.judul','asc')
+        ->get();
+
+        return response()->json($data);
+    }
+
+    public function showKategori($idk){
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->where('karyas.idkategori','=', $idk)
+        ->orderBy('karyas.judul','asc')
+        ->get();
+
+        return response()->json($data);
+    }
+
+    public function showLatest(){
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->orderBy('karyas.tgl_upload','desc')
+        ->get();
+
+        return response()->json($data);
+    }
+
+    public function showEarliest(){
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->orderBy('karyas.tgl_upload','asc')
+        ->get();
 
         return response()->json($data);
     }
@@ -105,7 +159,6 @@ class KaryaController extends Controller
         $this->validate($request, [
             'judul'=>'required',
             'keterangan'=>'required',
-            'tgl_upload'=>'required',
             'gambar'=>'required',
             'link'=>'active_url'
         ]);
@@ -116,7 +169,6 @@ class KaryaController extends Controller
         $data = [
             'judul'=>$request->input('judul'),
             'keterangan'=>$request->input('keterangan'),
-            'tgl_upload'=>$request->input('tgl_upload'),
             'gambar'=>url('karya/'.$gambar),
             'link'=>$request->input('link')
         ];
@@ -149,5 +201,18 @@ class KaryaController extends Controller
                 'status'=>200
             ]);
         }
+    }
+
+    public function cari(){
+        $cari = request('cari');
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->where('karyas.judul','like', '%'.$cari.'%')
+        ->orderBy('karyas.judul','asc')
+        ->get();
+
+        return response()->json($data);
     }
 }

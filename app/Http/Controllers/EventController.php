@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 
@@ -41,18 +43,32 @@ class EventController extends Controller
         $data = [
             'judul'=>$request->input('judul'),
             'deskripsi'=>$request->input('deskripsi'),
-            'tgl_event'=>$request->input('tgl_event'),
+            'tgl_event'=>$request->input('tgl_event'),//yyyy-mm-dd
             'gambar'=>url('event/'. $gambar)
         ];
 
         $run = Event::create($data);
 
         if($run){
+
+            $event = Event::where('tgl_event', "2023-01-08")->first();
+            $now = Carbon::now()->format('Y-m-d');
+            // $tgl = $event->tgl_event;
+            $datediff = DB::table('events')->select(DB::raw("DATEDIFF('$now','$event')"))->where('id', 1)->first();
+
             return response()->json([
                 'pesan'=>'Data berhasil disimpan',
                 'status'=>200,
-                'data'=>$data
+                'data'=>$data,
+                'diff'=>$datediff
             ]);
+            // Event::selectRaw('set TIMEZONE="Asia/Jakarta";
+            // select created_at, now() - interval "1 minutes" from events
+            // and created_at >= now() - interval "1 minutes" order by created_at desc limit 1')->all();
+
+            // if($datediff == 0){
+            //     Event::where('tgl_event', Carbon::now())->delete();
+            // }
         }
     }
 

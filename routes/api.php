@@ -74,17 +74,40 @@ Route::prefix('operator')->group(function(){
     Route::get('/index','OperatorController@index');
     Route::get('/show/{id}','OperatorController@show');
     Route::get('/del-auth/{id}', 'OperatorController@destroy');
+
+    //ADMIN EVENT ---------------------
+    Route::prefix('event')->group(function(){
+        Route::get('/index', 'EventController@index');
+        Route::post('/add', 'EventController@create');
+        Route::post('/edit/{id}', 'EventController@update');//kalo di put malah error
+        Route::get('/del/{id}', 'EventController@destroy');
+        Route::get('/show/{id}', 'EventController@show');
+    });
 });
 
 
 Route::prefix('pengguna')->group(function(){
     //PENGGUNA AUTH -------------------------
-    Route::post('/register', 'PenggunaController@create');
-    Route::post('/login', 'PenggunaController@login');
+    Route::post('/register', 'PenggunaController@create')->name('register');
+    Route::post('/login', 'PenggunaController@login')->name('login');
     Route::post('/edit/{id}', 'PenggunaController@update');
     Route::post('/forgot-password', 'PenggunaController@forgot');
+    Route::post('/change-profile-picture/{id}', 'PenggunaController@updateGambar');
     Route::get('/index', 'PenggunaController@index');
     Route::get('/show/{id}', 'PenggunaController@show');
     Route::get('/del-auth/{id}', 'PenggunaController@destroy');
+
+    //PENGGUNA KARYA -------------------------------
+    Route::prefix('karya')->group(function(){
+        Route::post('add','KaryaController@create');
+        Route::post('edit/{id}', 'KaryaController@update');
+        Route::get('index','KaryaController@index');
+        Route::get('show/{id}','KaryaController@show');//show pengguna
+        Route::get('del/{id}','KaryaController@destroy');
+        Route::get('show/{idk}','KaryaController@showKategori');
+        Route::get('show/latest','KaryaController@showLatest');
+        Route::get('show/earliest','KaryaController@showEarliest');
+        Route::get('cari','KaryaController@cari');
+    });
 });
 

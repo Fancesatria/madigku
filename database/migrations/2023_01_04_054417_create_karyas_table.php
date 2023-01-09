@@ -20,7 +20,7 @@ class CreateKaryasTable extends Migration
             $table->string('judul');
             $table->string('keterangan');
             $table->string('gambar')->nullable();
-            $table->date('tgl_upload');
+            $table->date('tgl_upload')->default(now());
             $table->string('status')->default('Menunggu Verifikasi');
             $table->string('link')->nullable();
             $table->Integer('like')->default(0);
