@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\Karya;
 use App\Models\Operator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StoreOperatorRequest;
 use App\Http\Requests\UpdateOperatorRequest;
@@ -183,5 +186,56 @@ class OperatorController extends Controller
                 'data'=>''
             ]);
         }
+    }
+
+    public function updateStatus($idkarya, Request $request){
+        $this->validate($request, [
+            'status'=>'required'
+        ]);
+
+        $karya = karya::find($idkarya);
+        $status = $request->input('status');
+
+        if($status == 'Diterima'){
+            $karya->tgl_verif = Carbon::now();
+            $karya->status = $status;
+
+        } else {
+            $karya->status = $status;
+        }
+        $karya->save();
+         return response()->json([
+            'pesan'=>'Status berhasil diubah',
+            'status'=>$status
+
+         ]);
+
+
+    }
+
+    public function semuaKarya(){
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->orderBy('karyas.judul','asc')
+        ->get();
+
+        return response()->json($data);
+    }
+
+
+
+    public function cari(){
+        $cari = request('cari');
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->where('karyas.judul','like', '%'.$cari.'%')
+        ->orderBy('karyas.judul','asc')
+        ->get();
+
+        return response()->json($data);
     }
 }

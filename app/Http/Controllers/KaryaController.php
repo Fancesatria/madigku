@@ -18,14 +18,15 @@ class KaryaController extends Controller
      */
     public function index()
     {
-        // $data = DB::table('karyas')
-        // ->join('kategoris','kategoris.id','=','karyas.idkategori')
-        // ->join('penggunas','penggunas.id','=','karyas.idpengguna')
-        // ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
-        // ->orderBy('karyas.judul','asc')
-        // ->get();
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->where('karyas.status','=','Diterima')
+        ->orderBy('karyas.judul','asc')
+        ->get();
 
-        $data = Karya::all();
+        // $data = Karya::all();
 
         // $data = Auth::pengguna();
 

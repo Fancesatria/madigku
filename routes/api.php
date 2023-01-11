@@ -75,13 +75,19 @@ Route::prefix('operator')->group(function(){
     Route::get('/show/{id}','OperatorController@show');
     Route::get('/del-auth/{id}', 'OperatorController@destroy');
 
-    //ADMIN EVENT ---------------------
+    //OPERATOR EVENT ---------------------
     Route::prefix('event')->group(function(){
         Route::get('/index', 'EventController@index');
         Route::post('/add', 'EventController@create');
         Route::post('/edit/{id}', 'EventController@update');//kalo di put malah error
         Route::get('/del/{id}', 'EventController@destroy');
         Route::get('/show/{id}', 'EventController@show');
+    });
+
+    //KARYA
+    Route::prefix('karya')->group(function(){
+        Route::get('/index', 'OperatorController@semuaKarya');
+        Route::post('/change-status/{idkarya}','OperatorController@updateStatus');
     });
 });
 
