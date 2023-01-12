@@ -20,6 +20,7 @@ class CreatePenggunasTable extends Migration
             $table->string('email');
             $table->string('password');
             $table->string('telp');
+            $table->string('token');
             $table->integer('status')->default(1);
             $table->timestamps();
         });

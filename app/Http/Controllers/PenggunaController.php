@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengguna;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StorePenggunaRequest;
@@ -39,23 +41,27 @@ class PenggunaController extends Controller
         ]);
 
         //di if karena gambarnya nullable
+        $token = Hash::make(Str::random(80));
         if($request->hasFile('gambar')){
             $gambar = $request->file('gambar')->getClientOriginalName();
             $request->file('gambar')->move('upload', $gambar);
+
 
             $data = [
                 'pengguna'=>$request->input('pengguna'),
                 'email'=>$request->input('email'),
                 'password'=>Hash::make($request->input('password')),
                 'telp'=>$request->input('telp'),
-                'gambar'=>url('upload/'.$gambar)
+                'gambar'=>url('upload/'.$gambar),
+                'token'=>$token
             ];
         } else {
             $data = [
                 'pengguna'=>$request->input('pengguna'),
                 'email'=>$request->input('email'),
                 'password'=>Hash::make($request->input('password')),
-                'telp'=>$request->input('telp')
+                'telp'=>$request->input('telp'),
+                'token'=>$token
             ];
         }
 
@@ -67,7 +73,7 @@ class PenggunaController extends Controller
                 'pesan'=>'Data berhasil disimpan',
                 'status'=>200,
                 'data'=>$data,
-                'otp'=>$otp
+                'otp'=>$otp,
             ]);
         }
     }
@@ -186,14 +192,18 @@ class PenggunaController extends Controller
 
         //buatmencocokkan data
         $user = Pengguna::where('email', $email)->first();//ambil data pengguna berdasarkan email
+        $token = DB::table('penggunas')->select('penggunas.token')
+        ->where('email',$email)->first();
 
         if(isset($user)){
             if($user->status == 1){
                 if(Hash::check($password, $user->password)){ //password disandingkan apakah match
+                    // sendsms();
                     return response()->json([
                         'pesan'=>'Login Berhasil',
-                        'data'=>$user,
+                        'data'=>$user
                     ]);
+
                 } else {
                     return response()->json([
                         'pesan'=>'Password salah',
@@ -277,5 +287,33 @@ class PenggunaController extends Controller
                 'pesan'=>'Data telah disimpan'
             ]);
         }
+    }
+
+    public function favorit($idpengguna){
+        $data = DB::table('karyas')
+        ->join('kategoris','kategoris.id','=','karyas.idkategori')
+        ->join('penggunas','penggunas.id','=','karyas.idpengguna')
+        ->select('karyas.*','kategoris.kategori','penggunas.id','penggunas.pengguna','penggunas.telp')
+        ->where('penggunas.id','=', $idpengguna)
+        ->orderBy('karyas.judul','asc')
+        ->get();
+
+        return response()->json($data);
+    }
+
+
+    public function sendsms(){
+        $basic = new \Nexmo\Client\Credentials\Basic('Nexmo key', 'Nexmo secret');
+        $client = new \Nexmo\Client($basic);
+
+        $message = $client->message()->send([
+            'to' => '085336164385',
+            'from' => 'John Doe',
+            'text' => 'A simple hello message sent from Vonage SMS API'
+        ]);
+
+        return response()->json([
+            'pesan'=>'SMS terkirim'
+        ]);
     }
 }
